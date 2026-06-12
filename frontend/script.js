@@ -5,7 +5,10 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, themeToggle;
+
+// Apply the saved theme as early as possible to avoid a flash of the wrong theme
+initTheme();
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,7 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton = document.getElementById('sendButton');
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
-    
+    themeToggle = document.getElementById('themeToggle');
+
+    // Sync the toggle's accessible label with the theme applied before DOM was ready
+    applyTheme(localStorage.getItem('theme') || 'dark');
+
     setupEventListeners();
     createNewSession();
     loadCourseStats();
@@ -41,6 +48,39 @@ function setupEventListeners() {
             sendMessage();
         });
     });
+
+    // Theme toggle (click + keyboard: Enter/Space handled natively by <button>)
+    themeToggle.addEventListener('click', toggleTheme);
+}
+
+// Theme Functions
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+}
+
+function applyTheme(theme) {
+    // 'dark' is the default and needs no attribute; 'light' opts in via data-theme
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+
+    // Keep the button's accessible label in sync with what it will switch to
+    if (themeToggle) {
+        const isLight = theme === 'light';
+        const label = isLight ? 'Switch to dark theme' : 'Switch to light theme';
+        themeToggle.setAttribute('aria-label', label);
+        themeToggle.setAttribute('title', label);
+    }
+}
+
+function toggleTheme() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const newTheme = isLight ? 'dark' : 'light';
+    applyTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
 }
 
 
