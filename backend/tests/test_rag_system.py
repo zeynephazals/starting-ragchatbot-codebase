@@ -6,12 +6,12 @@ real CourseSearchTool) and mock only the Anthropic client, so the model
 end-to-end path a content question travels, and it surfaces whether the
 configured system can return sources at all.
 """
+
 import types
 from unittest.mock import patch
 
-import pytest
-
 from config import config as real_config
+
 from tests.conftest import make_response, make_text_block, make_tool_use_block
 
 
@@ -34,6 +34,7 @@ def _build_rag(cfg, sample_course, sample_chunks):
     """Construct a RAGSystem with a mocked Anthropic client, pre-loaded with a course."""
     with patch("ai_generator.AnthropicFoundry"):
         from rag_system import RAGSystem
+
         rag = RAGSystem(cfg)
     rag.vector_store.add_course_metadata(sample_course)
     rag.vector_store.add_course_content(sample_chunks)
@@ -46,7 +47,11 @@ def _simulate_search_then_answer(rag, user_query):
     client.messages.create.side_effect = [
         make_response(
             "tool_use",
-            [make_tool_use_block("search_course_content", {"query": user_query}, "tu_1")],
+            [
+                make_tool_use_block(
+                    "search_course_content", {"query": user_query}, "tu_1"
+                )
+            ],
         ),
         make_response("end_turn", [make_text_block("Here is what the course says.")]),
     ]

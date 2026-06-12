@@ -17,4 +17,27 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
+    "black>=24.10.0",
+    "ruff>=0.8.0",
 ]
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, UP: pyupgrade, B: bugbear
+select = ["E", "W", "F", "I", "UP", "B"]
+# Defer to black for line-length formatting decisions
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["backend"]
+
+[tool.ruff.lint.per-file-ignores]
+# app.py filters warnings and does a late import before other imports by design.
+"backend/app.py" = ["E402"]

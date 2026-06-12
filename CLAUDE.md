@@ -22,7 +22,19 @@ The server must be started from the `backend/` directory because `app.py` uses r
 uv sync   # install dependencies
 ```
 
-Python 3.13+ is required. Uses `uv` as the package manager (`pyproject.toml`). No test suite exists.
+Python 3.13+ is required. Uses `uv` as the package manager (`pyproject.toml`).
+
+## Code Quality
+
+Formatting and linting are handled by `black` and `ruff` (configured in `pyproject.toml`). Convenience scripts live in `scripts/` and must be run from the repo root:
+
+```bash
+./scripts/format.sh    # auto-fix: ruff --fix then black (mutates files)
+./scripts/lint.sh      # ruff check only (no changes)
+./scripts/quality.sh   # CI gate: black --check + ruff check (fails on issues, no changes)
+```
+
+Run `./scripts/format.sh` before committing. `./scripts/quality.sh` is non-mutating and suitable for CI.
 
 ## Environment
 

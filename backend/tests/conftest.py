@@ -3,11 +3,12 @@
 These tests live in ``backend/tests`` but the application modules use flat
 imports (``from vector_store import ...``), so we put ``backend/`` on the path.
 """
+
 import os
-import sys
-import types
-import tempfile
 import shutil
+import sys
+import tempfile
+import types
 
 import pytest
 
@@ -16,8 +17,8 @@ BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
 
-from models import Course, Lesson, CourseChunk  # noqa: E402
-from vector_store import VectorStore, SearchResults  # noqa: E402
+from models import Course, CourseChunk, Lesson  # noqa: E402
+from vector_store import VectorStore  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #
@@ -31,10 +32,16 @@ def sample_course():
         course_link="https://example.com/mcp",
         instructor="Ada Lovelace",
         lessons=[
-            Lesson(lesson_number=1, title="Intro to MCP",
-                   lesson_link="https://example.com/mcp/1"),
-            Lesson(lesson_number=2, title="Building a Server",
-                   lesson_link="https://example.com/mcp/2"),
+            Lesson(
+                lesson_number=1,
+                title="Intro to MCP",
+                lesson_link="https://example.com/mcp/1",
+            ),
+            Lesson(
+                lesson_number=2,
+                title="Building a Server",
+                lesson_link="https://example.com/mcp/2",
+            ),
         ],
     )
 
@@ -79,8 +86,10 @@ def _build_store(path, sample_course, sample_chunks, max_results):
 @pytest.fixture
 def make_store(temp_chroma_path, sample_course, sample_chunks):
     """Factory: build a populated real VectorStore with a given max_results."""
+
     def _factory(max_results):
         return _build_store(temp_chroma_path, sample_course, sample_chunks, max_results)
+
     return _factory
 
 
@@ -118,5 +127,8 @@ def text_response():
 @pytest.fixture
 def tool_use_response():
     def _factory(name, tool_input, tool_id="tool_1"):
-        return make_response("tool_use", [make_tool_use_block(name, tool_input, tool_id)])
+        return make_response(
+            "tool_use", [make_tool_use_block(name, tool_input, tool_id)]
+        )
+
     return _factory

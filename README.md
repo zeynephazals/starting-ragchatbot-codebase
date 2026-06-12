@@ -54,3 +54,15 @@ The application will be available at:
 - Web Interface: `http://localhost:8000`
 - API Documentation: `http://localhost:8000/docs`
 
+## Code Quality
+
+This project uses [`black`](https://black.readthedocs.io/) for formatting and [`ruff`](https://docs.astral.sh/ruff/) for linting (and import sorting). Configuration lives in `pyproject.toml`.
+
+```bash
+./scripts/format.sh    # auto-format the codebase (ruff --fix + black)
+./scripts/lint.sh      # report lint issues without changing files
+./scripts/quality.sh   # check formatting + lint (non-mutating, for CI)
+```
+
+Run `./scripts/format.sh` before committing changes.
+

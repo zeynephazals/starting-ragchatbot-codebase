@@ -1,9 +1,11 @@
+from typing import Any
+
 from anthropic import AnthropicFoundry
-from typing import List, Optional, Dict, Any
+
 
 class AIGenerator:
     """Handles interactions with Claude via Azure Anthropic Foundry"""
-    
+
     # Static system prompt to avoid rebuilding on each call
     SYSTEM_PROMPT = """ You are an AI assistant specialized in course materials and educational content with access to tools for course information.
 
@@ -39,7 +41,7 @@ All responses must be:
 4. **Example-supported** - Include relevant examples when they aid understanding
 Provide only the direct answer to what was asked.
 """
-    
+
     # Maximum number of sequential tool-use rounds per user query.
     MAX_TOOL_ROUNDS = 2
 
@@ -48,16 +50,15 @@ Provide only the direct answer to what was asked.
         self.model = model
 
         # Pre-build base API parameters
-        self.base_params = {
-            "model": self.model,
-            "temperature": 0,
-            "max_tokens": 800
-        }
+        self.base_params = {"model": self.model, "temperature": 0, "max_tokens": 800}
 
-    def generate_response(self, query: str,
-                         conversation_history: Optional[str] = None,
-                         tools: Optional[List] = None,
-                         tool_manager=None) -> str:
+    def generate_response(
+        self,
+        query: str,
+        conversation_history: str | None = None,
+        tools: list | None = None,
+        tool_manager=None,
+    ) -> str:
         """
         Generate AI response with optional tool usage and conversation context.
 
@@ -91,7 +92,9 @@ Provide only the direct answer to what was asked.
         # Claude can see them (preserves the original single-call contract), but make
         # just one call. With no tools at all this is a plain completion.
         if not (tools and tool_manager):
-            return self._extract_text(self._call_api(messages, system_content, tools=tools))
+            return self._extract_text(
+                self._call_api(messages, system_content, tools=tools)
+            )
 
         # Sequential tool-use loop: each iteration is one tool round. Tools are
         # offered every round so Claude can chain up to MAX_TOOL_ROUNDS calls,
@@ -114,8 +117,12 @@ Provide only the direct answer to what was asked.
         # WITHOUT tools to force a synthesized text answer.
         return self._extract_text(self._call_api(messages, system_content))
 
-    def _call_api(self, messages: List[Dict[str, Any]], system_content: str,
-                  tools: Optional[List] = None):
+    def _call_api(
+        self,
+        messages: list[dict[str, Any]],
+        system_content: str,
+        tools: list | None = None,
+    ):
         """Make a single Claude API call, optionally offering tools."""
         api_params = {
             **self.base_params,
@@ -127,7 +134,7 @@ Provide only the direct answer to what was asked.
             api_params["tool_choice"] = {"type": "auto"}
         return self.client.messages.create(**api_params)
 
-    def _run_tools(self, response, tool_manager) -> List[Dict[str, Any]]:
+    def _run_tools(self, response, tool_manager) -> list[dict[str, Any]]:
         """
         Execute every tool_use block in a response and return tool_result blocks.
 
@@ -143,11 +150,13 @@ Provide only the direct answer to what was asked.
                 content = tool_manager.execute_tool(block.name, **block.input)
             except Exception as e:
                 content = f"Tool '{block.name}' failed: {e}"
-            tool_results.append({
-                "type": "tool_result",
-                "tool_use_id": block.id,
-                "content": content,
-            })
+            tool_results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": block.id,
+                    "content": content,
+                }
+            )
         return tool_results
 
     def _extract_text(self, response) -> str:

@@ -6,13 +6,12 @@ Two layers:
   * Integration tests with a real VectorStore wired to the *actual* config value
     — these reveal whether the system as configured can return content at all.
 """
+
 from unittest.mock import MagicMock
 
-import pytest
-
+from config import config
 from search_tools import CourseSearchTool
 from vector_store import SearchResults
-from config import config
 
 
 # --------------------------------------------------------------------------- #
@@ -44,7 +43,9 @@ def test_execute_formats_results_with_headers():
 
 def test_execute_passes_course_and_lesson_filters():
     store = MagicMock()
-    store.search.return_value = _results(["doc"], [{"course_title": "X", "lesson_number": 2}])
+    store.search.return_value = _results(
+        ["doc"], [{"course_title": "X", "lesson_number": 2}]
+    )
     store.get_lesson_link.return_value = None
 
     tool = CourseSearchTool(store)
