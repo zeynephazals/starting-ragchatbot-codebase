@@ -17,8 +17,24 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
-    "black>=24.10.0",
-    "ruff>=0.8.0",
+    "httpx>=0.28.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+]
+markers = [
+    "api: tests that exercise the FastAPI HTTP endpoints",
+    "unit: isolated unit tests",
+    "integration: tests that wire several components together",
 ]
 
 [tool.black]
