@@ -28,7 +28,10 @@ function setupEventListeners() {
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
-    
+
+    // New chat
+    document.getElementById('newChatButton').addEventListener('click', createNewSession);
+
     
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
@@ -125,7 +128,7 @@ function addMessage(content, type, sources = null, isWelcome = false) {
         html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.join(', ')}</div>
+                <div class="sources-content">${sources.join('')}</div>
             </details>
         `;
     }
@@ -147,6 +150,20 @@ function escapeHtml(text) {
 // Removed removeMessage function - no longer needed since we handle loading differently
 
 async function createNewSession() {
+    // Clean up the old session on the backend before resetting local state
+    if (currentSessionId) {
+        try {
+            await fetch(`${API_URL}/sessions/clear`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: currentSessionId })
+            });
+        } catch (e) {
+            // Non-fatal: still reset the UI even if cleanup fails
+            console.error('Failed to clear session:', e);
+        }
+    }
+
     currentSessionId = null;
     chatMessages.innerHTML = '';
     addMessage('Welcome to the Course Materials Assistant! I can help you with questions about courses, lessons and specific content. What would you like to know?', 'assistant', null, true);

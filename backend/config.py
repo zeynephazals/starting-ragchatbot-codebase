@@ -8,9 +8,10 @@ load_dotenv()
 @dataclass
 class Config:
     """Configuration settings for the RAG system"""
-    # Anthropic API settings
-    ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
-    ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
+    # Azure Anthropic Foundry settings
+    AZURE_API_KEY: str = os.getenv("ANTHROPIC_FOUNDRY_API_KEY", "")
+    AZURE_ENDPOINT: str = os.getenv("ANTHROPIC_FOUNDRY_BASE_URL", "")
+    ANTHROPIC_MODEL: str = "claude-haiku-4-5"
     
     # Embedding model settings
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"

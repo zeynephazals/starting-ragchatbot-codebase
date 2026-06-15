@@ -1,5 +1,10 @@
 #!/bin/bash
 
+export CLAUDE_CODE_USE_FOUNDRY="1" 
+export ANTHROPIC_FOUNDRY_BASE_URL="" 
+export ANTHROPIC_FOUNDRY_API_KEY="" 
+export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-8"
+
 # Create necessary directories
 mkdir -p docs 
 
